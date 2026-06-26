@@ -127,6 +127,7 @@
     const now = new Date();
     document.getElementById("synced").textContent =
       "synced " + now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+    postHeight();
   }
 
   // Try the live feed; fall back to mock for the preview.
@@ -134,6 +135,18 @@
     .then(r => { if (!r.ok) throw new Error("no feed yet"); return r.json(); })
     .then(data => render(Array.isArray(data) ? data : MOCK))
     .catch(() => render(MOCK));
+
+  // ── auto-resize: report content height to the Framer parent ─────────
+  function postHeight() {
+    const el = document.querySelector(".log");
+    if (!el || !window.parent) return;
+    const h = Math.ceil(el.getBoundingClientRect().height) + 2;
+    window.parent.postMessage({ type: "live-system-log-height", height: h }, "*");
+  }
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.body);
+  window.addEventListener("resize", postHeight);
+  window.addEventListener("load", postHeight);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(postHeight);
 </script>
 </body>
 </html>
