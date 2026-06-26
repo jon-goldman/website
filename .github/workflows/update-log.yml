@@ -8,6 +8,11 @@ on:
 permissions:
   contents: write
 
+# never let two runs push at once
+concurrency:
+  group: live-system-log
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
@@ -19,11 +24,24 @@ jobs:
       - name: build entries.json
         working-directory: system-log
         run: node update-log.mjs
-      - name: commit if changed
+      - name: commit and push if changed
         working-directory: system-log
         run: |
           git config user.name "log-bot"
           git config user.email "actions@users.noreply.github.com"
           git add entries.json
-          git diff --staged --quiet || git commit -m "update live system log"
-          git push
+          if git diff --staged --quiet; then
+            echo "no changes — nothing to commit"
+            exit 0
+          fi
+          git commit -m "update live system log"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "pushed on attempt $attempt"
+              exit 0
+            fi
+            echo "push rejected; syncing remote then retrying (attempt $attempt)"
+            git pull --rebase --autostash origin main || git rebase --abort
+          done
+          echo "could not push after 5 attempts"
+          exit 1
