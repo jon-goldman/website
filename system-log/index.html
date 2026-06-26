@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>live system log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #F1ECE1;
+    --ink: #1F1C18;
+    --soft: #79736A;
+    --riso: #234E70;
+    --rule: #D6CFC1;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Courier Prime", monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+  .log {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 28px clamp(20px, 6vw, 40px) 34px;
+  }
+
+  /* header */
+  .head { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+  .head svg { width: 13px; height: 13px; color: var(--riso); flex: none; }
+  .head .title {
+    font-size: 12.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--soft);
+  }
+  .head .live {
+    margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; letter-spacing: 0.08em; color: var(--soft);
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--riso);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .rule { height: 1px; background: var(--ink); margin: 12px 0 2px; }
+
+  /* rows */
+  ul { list-style: none; margin: 0; padding: 0; }
+  li {
+    display: grid;
+    grid-template-columns: 11ch 8ch 1fr auto;
+    gap: 4px 14px;
+    align-items: baseline;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  li .date { color: var(--soft); white-space: nowrap; }
+  li .act { color: var(--riso); }
+  li .item { color: var(--ink); font-family: "EB Garamond", serif; font-size: 16px; }
+  li .src { color: var(--soft); font-size: 11px; letter-spacing: 0.06em; text-align: right; white-space: nowrap; }
+  li.fresh .item { font-style: normal; }
+
+  .foot {
+    margin-top: 16px; font-size: 11px; letter-spacing: 0.05em; color: var(--soft);
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+
+  @media (max-width: 460px) {
+    li { grid-template-columns: 1fr auto; }
+    li .date { grid-column: 1; }
+    li .act { grid-column: 2; text-align: right; }
+    li .item { grid-column: 1 / -1; }
+    li .src { grid-column: 1 / -1; text-align: left; }
+  }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+</style>
+</head>
+<body>
+  <div class="log">
+    <div class="head">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="1.4"/></svg>
+      <span class="title">live system log</span>
+      <span class="live"><span class="dot"></span><span id="synced">syncing…</span></span>
+    </div>
+    <div class="rule"></div>
+    <ul id="entries"></ul>
+    <div class="foot">
+      <span>pulls from are.na + letterboxd</span>
+      <span>refreshes daily</span>
+    </div>
+  </div>
+
+<script>
+  // ── DATA ───────────────────────────────────────────────────────────
+  // This is the ONLY part that changes for the live version. A GitHub
+  // Action will fetch are.na + Letterboxd, write entries.json, and the
+  // widget below will load it. Until that file exists, it falls back to
+  // the mock rows so the design is visible now.
+  const MOCK = [
+    { date: "2026-06-23", action: "watched", item: "Film About a Father Who", source: "letterboxd" },
+    { date: "2026-06-22", action: "saved",   item: "riso registration marks", source: "are.na" },
+    { date: "2026-06-20", action: "watched", item: "Kicking the Clouds",       source: "letterboxd" },
+    { date: "2026-06-19", action: "saved",   item: "Interference Archive — ephemera", source: "are.na" },
+    { date: "2026-06-17", action: "watched", item: "La Jetée",                 source: "letterboxd" },
+    { date: "2026-06-15", action: "saved",   item: "Speckletone, 80lb",        source: "are.na" },
+    { date: "2026-06-12", action: "watched", item: "Stalker",                  source: "letterboxd" },
+    { date: "2026-06-10", action: "saved",   item: "carried-interest, a diagram", source: "are.na" },
+  ];
+
+  function render(entries) {
+    const ul = document.getElementById("entries");
+    ul.innerHTML = "";
+    entries.forEach((e, i) => {
+      const li = document.createElement("li");
+      if (i === 0) li.className = "fresh";
+      li.innerHTML =
+        `<span class="date">${e.date}</span>` +
+        `<span class="act">${e.action}</span>` +
+        `<span class="item">${e.item}</span>` +
+        `<span class="src">${e.source}</span>`;
+      ul.appendChild(li);
+    });
+    const now = new Date();
+    document.getElementById("synced").textContent =
+      "synced " + now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+
+  // Try the live feed; fall back to mock for the preview.
+  fetch("./entries.json")
+    .then(r => { if (!r.ok) throw new Error("no feed yet"); return r.json(); })
+    .then(data => render(Array.isArray(data) ? data : MOCK))
+    .catch(() => render(MOCK));
+</script>
+</body>
+</html>
