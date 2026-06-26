@@ -70,6 +70,10 @@
     display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   }
 
+  /* compact mode (homepage strip): bare rows only */
+  body.compact .head, body.compact .rule, body.compact .foot { display: none; }
+  body.compact .log { padding-top: 6px; padding-bottom: 6px; }
+
   @media (max-width: 460px) {
     li { grid-template-columns: 1fr auto; }
     li .date { grid-column: 1; }
@@ -111,10 +115,15 @@
     { date: "2026-06-10", action: "saved",   item: "carried-interest, a diagram", source: "are.na" },
   ];
 
+  const params = new URLSearchParams(location.search);
+  const ROW_CAP = parseInt(params.get("rows"), 10) || 0;       // e.g. ?rows=3
+  if (params.has("compact")) document.body.classList.add("compact"); // ?compact=1
+
   function render(entries) {
     const ul = document.getElementById("entries");
     ul.innerHTML = "";
-    entries.forEach((e, i) => {
+    const rows = ROW_CAP ? entries.slice(0, ROW_CAP) : entries;
+    rows.forEach((e, i) => {
       const li = document.createElement("li");
       if (i === 0) li.className = "fresh";
       li.innerHTML =
