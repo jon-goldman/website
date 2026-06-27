@@ -63,7 +63,8 @@
     text-decoration: none;
     color: inherit;
   }
-  a.row:hover .item { color: var(--riso); }
+  a.row .item { text-decoration: underline; text-decoration-color: var(--rule); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a.row:hover .item { color: var(--riso); text-decoration-color: var(--riso); }
   li .date { color: var(--soft); white-space: nowrap; }
   li .act { color: var(--riso); }
   li .item { color: var(--ink); font-family: "EB Garamond", serif; font-size: 16px; }
@@ -75,8 +76,28 @@
     display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   }
 
+  /* month markers */
+  li.month {
+    border-bottom: none;
+    padding: 18px 0 4px;
+    font-size: 11px; letter-spacing: 0.14em; color: var(--soft);
+  }
+  li.month:first-child { padding-top: 2px; }
+
+  /* terminal cursor */
+  .cursor {
+    width: 7px; height: 14px; margin-top: 14px; background: var(--riso);
+    animation: blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+  /* rows print in */
+  #entries li { animation: rowin 0.45s ease both; }
+  @keyframes rowin { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
   /* compact mode (homepage strip): bare rows only */
-  body.compact .head, body.compact .rule, body.compact .foot { display: none; }
+  body.compact .head, body.compact .rule, body.compact .foot,
+  body.compact li.month, body.compact .cursor { display: none; }
   body.compact .log { padding-top: 6px; padding-bottom: 6px; }
 
   @media (max-width: 460px) {
@@ -86,7 +107,9 @@
     .row .item { grid-column: 1 / -1; }
     .row .src { grid-column: 1 / -1; text-align: left; }
   }
-  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .dot, .cursor, #entries li { animation: none; opacity: 1; transform: none; }
+  }
 </style>
 </head>
 <body>
@@ -98,6 +121,7 @@
     </div>
     <div class="rule"></div>
     <ul id="entries"></ul>
+    <div class="cursor" aria-hidden="true"></div>
     <div class="foot">
       <span>pulls from are.na + letterboxd</span>
       <span>refreshes daily</span>
@@ -125,13 +149,40 @@
   const ROW_CAP = parseInt(params.get("rows"), 10) || 0;       // e.g. ?rows=3
   if (params.has("compact")) document.body.classList.add("compact"); // ?compact=1
 
-  function render(entries) {
+  const MONTHS = ["january","february","march","april","may","june",
+                  "july","august","september","october","november","december"];
+
+  function syncedLabel(d) {
+    if (!d || isNaN(d)) return "";
+    const startOfDay = x => { const t = new Date(x); t.setHours(0, 0, 0, 0); return t; };
+    const diff = Math.round((startOfDay(new Date()) - startOfDay(d)) / 86400000);
+    if (diff <= 0) return "synced today";
+    if (diff === 1) return "synced yesterday";
+    if (diff < 7) return "synced " + diff + " days ago";
+    return "synced " + d.toLocaleDateString([], { month: "short", day: "numeric" }).toLowerCase();
+  }
+
+  function render(entries, updated) {
     const ul = document.getElementById("entries");
     ul.innerHTML = "";
+    const compact = document.body.classList.contains("compact");
     const rows = ROW_CAP ? entries.slice(0, ROW_CAP) : entries;
-    rows.forEach((e, i) => {
+    const nowYear = String(new Date().getFullYear());
+    let lastMonth = "", n = 0;
+
+    rows.forEach(e => {
+      const ym = String(e.date).slice(0, 7);                 // YYYY-MM
+      if (!compact && ym !== lastMonth) {
+        lastMonth = ym;
+        const [y, mo] = ym.split("-");
+        const m = document.createElement("li");
+        m.className = "month";
+        m.textContent = MONTHS[parseInt(mo, 10) - 1] + (y !== nowYear ? " " + y : "");
+        m.style.animationDelay = (n++ * 40) + "ms";
+        ul.appendChild(m);
+      }
       const li = document.createElement("li");
-      if (i === 0) li.className = "fresh";
+      li.style.animationDelay = (n++ * 40) + "ms";
       const inner =
         `<span class="date">${e.date}</span>` +
         `<span class="act">${e.action}</span>` +
@@ -142,17 +193,24 @@
         : `<span class="row">${inner}</span>`;
       ul.appendChild(li);
     });
-    const now = new Date();
-    document.getElementById("synced").textContent =
-      "synced " + now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+    const synced = document.getElementById("synced");
+    if (synced) synced.textContent = updated
+      ? syncedLabel(updated)
+      : "synced " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
     postHeight();
   }
 
   // Try the live feed; fall back to mock for the preview.
   fetch("./entries.json")
     .then(r => { if (!r.ok) throw new Error("no feed yet"); return r.json(); })
-    .then(data => render(Array.isArray(data) ? data : MOCK))
-    .catch(() => render(MOCK));
+    .then(data => {
+      const entries = Array.isArray(data) ? data
+        : (data && Array.isArray(data.entries) ? data.entries : MOCK);
+      const updated = (data && data.updated) ? new Date(data.updated) : null;
+      render(entries, updated);
+    })
+    .catch(() => render(MOCK, null));
 
   // ── auto-resize: report content height to the Framer parent ─────────
   function postHeight() {
