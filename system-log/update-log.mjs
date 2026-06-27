@@ -61,15 +61,16 @@ function pick(block, tag) {
   return m ? m[1].trim() : null;
 }
 function clean(s) {
-  return String(s)
+  const t = String(s)
     .replace(/<!\[CDATA\[|\]\]>/g, "")
     .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n))
     .replace(/&amp;/g, "&").replace(/&#39;/g, "'").replace(/&quot;/g, '"')
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">")
     .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 70);
+    .trim();
+  if (t.length <= 64) return t;
+  return t.slice(0, 64).replace(/\s*\S*$/, "").trim() + "…"; // back off to last whole word
 }
 
 // ── main ────────────────────────────────────────────────────────────
@@ -82,7 +83,8 @@ async function main() {
   }
   entries.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
   entries = entries.slice(0, MAX_ROWS);
-  await writeFile("entries.json", JSON.stringify(entries, null, 2) + "\n");
+  const payload = { updated: new Date().toISOString(), entries };
+  await writeFile("entries.json", JSON.stringify(payload, null, 2) + "\n");
   console.log(`wrote ${entries.length} rows`);
 }
 
