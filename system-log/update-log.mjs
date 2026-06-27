@@ -18,6 +18,7 @@ export function parseArena(json) {
       action: "saved",
       item: clean(b.title || b.generated_title || b.class || "untitled"),
       source: "are.na",
+      url: "https://www.are.na/block/" + b.id,
     }));
 }
 
@@ -41,6 +42,7 @@ export function parseLetterboxd(xml) {
       action: "watched",
       item: clean(film),
       source: "letterboxd",
+      url: pick(raw, "link") || undefined,
     });
   }
   return out;
