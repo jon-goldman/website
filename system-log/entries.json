@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-29T14:43:14.221Z",
+  "updated": "2026-06-30T13:05:01.198Z",
   "entries": [
     {
       "date": "2026-06-26",
@@ -7,6 +7,13 @@
       "item": "Female Trouble",
       "source": "letterboxd",
       "url": "https://letterboxd.com/jongoldman/film/female-trouble/"
+    },
+    {
+      "date": "2026-06-23",
+      "action": "watched",
+      "item": "My Neighbor Totoro",
+      "source": "letterboxd",
+      "url": "https://letterboxd.com/jongoldman/film/my-neighbor-totoro/"
     },
     {
       "date": "2026-06-11",
@@ -63,13 +70,6 @@
       "item": "Do Not Expect Too Much from the End of the World",
       "source": "letterboxd",
       "url": "https://letterboxd.com/jongoldman/film/do-not-expect-too-much-from-the-end-of-the-world/"
-    },
-    {
-      "date": "2026-05-18",
-      "action": "saved",
-      "item": "Artistic Collaborations: 50 Years at Universal Limited Art…",
-      "source": "are.na",
-      "url": "https://www.are.na/block/46305160"
     }
   ]
 }
