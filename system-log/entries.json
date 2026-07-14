@@ -1,6 +1,13 @@
 {
-  "updated": "2026-07-12T11:51:43.726Z",
+  "updated": "2026-07-14T12:06:03.274Z",
   "entries": [
+    {
+      "date": "2026-07-14",
+      "action": "saved",
+      "item": "tumblr_kos3wfbwFL1qz5g75o1_r1_500.jpg",
+      "source": "are.na",
+      "url": "https://www.are.na/block/162710"
+    },
     {
       "date": "2026-07-02",
       "action": "saved",
@@ -63,13 +70,6 @@
       "item": "Getting Messy in the Archive at LA’s Art Book Fair",
       "source": "are.na",
       "url": "https://www.are.na/block/46780823"
-    },
-    {
-      "date": "2026-06-01",
-      "action": "watched",
-      "item": "How Not to Be Seen: A Fucking Didactic Educational .MOV File",
-      "source": "letterboxd",
-      "url": "https://letterboxd.com/jongoldman/film/how-not-to-be-seen-a-fucking-didactic-educational-mov-file/"
     }
   ]
 }
