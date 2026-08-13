@@ -1,6 +1,13 @@
 {
-  "updated": "2026-08-12T11:39:56.726Z",
+  "updated": "2026-08-13T11:40:22.593Z",
   "entries": [
+    {
+      "date": "2026-08-12",
+      "action": "saved",
+      "item": "An Atlas of Modern Risography",
+      "source": "are.na",
+      "url": "https://www.are.na/block/11039578"
+    },
     {
       "date": "2026-08-11",
       "action": "saved",
@@ -63,13 +70,6 @@
       "item": "My Neighbor Totoro",
       "source": "letterboxd",
       "url": "https://letterboxd.com/jongoldman/film/my-neighbor-totoro/"
-    },
-    {
-      "date": "2026-06-11",
-      "action": "saved",
-      "item": "The Earth Belongs to the People : Newsreel : Free Download,…",
-      "source": "are.na",
-      "url": "https://www.are.na/block/46925282"
     }
   ]
 }
