@@ -1,6 +1,27 @@
 {
-  "updated": "2026-08-31T17:46:17.210Z",
+  "updated": "2026-09-01T15:20:06.325Z",
   "entries": [
+    {
+      "date": "2026-09-01",
+      "action": "saved",
+      "item": "Public Humanities Fellowship Program",
+      "source": "are.na",
+      "url": "https://www.are.na/block/49999823"
+    },
+    {
+      "date": "2026-08-31",
+      "action": "saved",
+      "item": "Home - Antipode Online",
+      "source": "are.na",
+      "url": "https://www.are.na/block/49997430"
+    },
+    {
+      "date": "2026-08-31",
+      "action": "saved",
+      "item": "(99+) Academia.edu",
+      "source": "are.na",
+      "url": "https://www.are.na/block/49997380"
+    },
     {
       "date": "2026-08-12",
       "action": "saved",
@@ -49,27 +70,6 @@
       "item": "36165588382_b9baaa109f_o.jpg",
       "source": "are.na",
       "url": "https://www.are.na/block/4874570"
-    },
-    {
-      "date": "2026-07-01",
-      "action": "saved",
-      "item": "Uncharted Territory: Humans and the Rise of AI (film)",
-      "source": "are.na",
-      "url": "https://www.are.na/block/47504485"
-    },
-    {
-      "date": "2026-06-26",
-      "action": "watched",
-      "item": "Female Trouble",
-      "source": "letterboxd",
-      "url": "https://letterboxd.com/jongoldman/film/female-trouble/"
-    },
-    {
-      "date": "2026-06-23",
-      "action": "watched",
-      "item": "My Neighbor Totoro",
-      "source": "letterboxd",
-      "url": "https://letterboxd.com/jongoldman/film/my-neighbor-totoro/"
     }
   ]
 }
